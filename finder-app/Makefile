@@ -1,13 +1,22 @@
-CROSS_COMPILE=
+APP=writer
+CFLAGS=-Wall
+CFILE=$(APP).c
+OBJECTS=$(APP).o
+BINARY=$(APP)
 
+ifdef CROSS_COMPILE
+	CC=$(CROSS_COMPILE)gcc
+else
+	CC=gcc
+endif
 
-writer: writer.o
-	$(CROSS_COMPILE)gcc -g -Wall -I/ writer.o -o writer
-        
+all : $(BINARY)
 
-writer.o: writer.c
-	$(CROSS_COMPILE)gcc -g -Wall   -c -o writer.o writer.c
-        
+$(BINARY) : $(OBJECTS)
+	$(CC) -o $@ $^
 
-clean:
-	rm -f *.o writer *.elf *.map
+%.o:%.c
+	$(CC) $(CFLAGS) -c -o $@ $^
+
+clean : 
+	rm -rf $(BINARY) $(OBJECTS)
