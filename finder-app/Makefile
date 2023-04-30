@@ -1,12 +1,12 @@
-ROSS_COMPILE=
+CROSS_COMPILE=
 
 
 writer: writer.o
-	$(CROSS_COMPILE)gcc -g -Wall -I/ writer.o -o writer
+	$(CROSS_COMPILE)gcc.exe -g -Wall -I/ writer.o -o writer
         
 
 writer.o: writer.c
-	$(CROSS_COMPILE)gcc -g -Wall   -c -o writer.o writer.c
+	$(CROSS_COMPILE)gcc.exe -g -Wall   -c -o writer.o writer.c
         
 
 clean:
