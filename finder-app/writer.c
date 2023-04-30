@@ -10,7 +10,7 @@
 
 
 int main(int argc, char *argv[]){
-  int open_error;
+  int open_res;
   
   openlog(NULL,0,LOG_USER);
   if(argc != 3){
