@@ -1,22 +1,11 @@
-APP=writer
-CFLAGS=-Wall
-CFILE=$(APP).c
-OBJECTS=$(APP).o
-BINARY=$(APP)
 
-ifdef CROSS_COMPILE
-	CC=$(CROSS_COMPILE)gcc
-else
-	CC=gcc
-endif
+CROSS_COMPILE=aarch64-none-linux-gnu-
 
-all : $(BINARY)
 
-$(BINARY) : $(OBJECTS)
-	$(CC) -o $@ $^
+all:writer-arm
+writer: writer.o
+	$(CROSS_COMPILE)gcc -Wall -Werror -c writer.c -o writer.o
 
-%.o:%.c
-	$(CC) $(CFLAGS) -c -o $@ $^
+writer-arm: writer.o
+	$(CROSS_COMPILE)gcc -Wall -Werror writer.o -o writer-arm -static
 
-clean : 
-	rm -rf $(BINARY) $(OBJECTS)
