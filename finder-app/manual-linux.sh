@@ -69,21 +69,37 @@ else
     cd busybox
 fi
 
-# TODO: Make and install busybox
+make ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE}
+make CONFIG_PREFIX=${OUTDIR}/rootfs ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} install
+cd "${OUTDIR}/rootfs"
 
 echo "Library dependencies"
 ${CROSS_COMPILE}readelf -a bin/busybox | grep "program interpreter"
 ${CROSS_COMPILE}readelf -a bin/busybox | grep "Shared library"
 
-# TODO: Add library dependencies to rootfs
+cd "${OUTDIR}/rootfs"
+cp "$(${CROSS_COMPILE}gcc -print-sysroot)/lib/ld-linux-aarch64.so.1" "${OUTDIR}/rootfs/lib"
+cp "$(${CROSS_COMPILE}gcc -print-sysroot)/lib64/libm.so.6" "${OUTDIR}/rootfs/lib64"
+cp "$(${CROSS_COMPILE}gcc -print-sysroot)/lib64/libc.so.6" "${OUTDIR}/rootfs/lib64"
+cp "$(${CROSS_COMPILE}gcc -print-sysroot)/lib64/libresolv.so.2" "${OUTDIR}/rootfs/lib64"
 
-# TODO: Make device nodes
+sudo mknod -m 666 dev/null c 1 3
+sudo mknod -m 600 dev/console c 5 1
 
-# TODO: Clean and build the writer utility
+cd "${FINDER_APP_DIR}"
+export CROSS_COMPILE=${CROSS_COMPILE}
+make clean
+make
 
-# TODO: Copy the finder related scripts and executables to the /home directory
-# on the target rootfs
+cp -r "${FINDER_APP_DIR}/../conf" "${OUTDIR}/rootfs/home"
+cp "${FINDER_APP_DIR}/autorun-qemu.sh" "${OUTDIR}/rootfs/home"
+cp "${FINDER_APP_DIR}/finder.sh" "${OUTDIR}/rootfs/home"
+cp "${FINDER_APP_DIR}/finder-test.sh" "${OUTDIR}/rootfs/home"
+cp "${FINDER_APP_DIR}/writer" "${OUTDIR}/rootfs/home"
 
-# TODO: Chown the root directory
+cd "${OUTDIR}/rootfs"
+sudo chown -R root:root *
 
-# TODO: Create initramfs.cpio.gz
+find . | cpio -H newc -ov --owner root:root > ${OUTDIR}/initramfs.cpio
+gzip -f ${OUTDIR}/initramfs.cpio
+
